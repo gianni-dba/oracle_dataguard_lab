@@ -1,0 +1,100 @@
+# tnsnames.ora per Data Guard
+# Definisce alias per CDB e PDB con supporto failover automatico
+
+# CDB
+
+# Connessione diretta al Primario
+ORCL_PRI =
+  (DESCRIPTION =
+    (ADDRESS_LIST =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = oracle-node1)(PORT = 1521))
+    )
+    (CONNECT_DATA =
+      (SERVICE_NAME = ORCL)
+    )
+  )
+
+# Connessione diretta allo Standby
+ORCL_STBY_NODE1 =
+  (DESCRIPTION =
+    (ADDRESS_LIST =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = oracle-node5)(PORT = 1521))
+    )
+    (CONNECT_DATA =
+      (SERVICE_NAME = orcl_stby_node1)
+    )
+  )
+
+# Connessione con failover automatico (prova prima node1, poi node5)
+ORCL =
+  (DESCRIPTION =
+    (ADDRESS_LIST =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = oracle-node1)(PORT = 1521))
+      (ADDRESS = (PROTOCOL = TCP)(HOST = oracle-node5)(PORT = 1521))
+    )
+    (CONNECT_DATA =
+      (SERVICE_NAME = ORCL)
+    )
+  )
+
+# PDB
+
+# PDB1 - Connessioni specifiche e con failover
+PDB1_PRI =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = oracle-node1)(PORT = 1521))
+    (CONNECT_DATA =
+      (SERVICE_NAME = pdb1)
+    )
+  )
+
+PDB1_STBY =
+  (DESCRIPTION =
+    (ADDRESS_LIST =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = oracle-node5)(PORT = 1521))
+    )
+    (CONNECT_DATA =
+      (SERVICE_NAME = pdb1)
+    )
+  )
+
+PDB1 =
+  (DESCRIPTION =
+    (ADDRESS_LIST =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = oracle-node1)(PORT = 1521))
+      (ADDRESS = (PROTOCOL = TCP)(HOST = oracle-node5)(PORT = 1521))
+    )
+    (CONNECT_DATA =
+      (SERVICE_NAME = pdb1)
+    )
+  )
+
+# PDB3 - Connessioni specifiche e con failover
+PDB3_PRI =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = oracle-node1)(PORT = 1521))
+    (CONNECT_DATA =
+      (SERVICE_NAME = pdb3)
+    )
+  )
+
+PDB3_STBY =
+  (DESCRIPTION =
+    (ADDRESS_LIST =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = oracle-node5)(PORT = 1521))
+    )
+    (CONNECT_DATA =
+      (SERVICE_NAME = pdb3)
+    )
+  )
+
+PDB3 =
+  (DESCRIPTION =
+    (ADDRESS_LIST =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = oracle-node1)(PORT = 1521))
+      (ADDRESS = (PROTOCOL = TCP)(HOST = oracle-node5)(PORT = 1521))
+    )
+    (CONNECT_DATA =
+      (SERVICE_NAME = pdb3)
+    )
+  )
