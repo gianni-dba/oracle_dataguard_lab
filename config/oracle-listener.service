@@ -1,0 +1,20 @@
+# oracle-listener.service - per avvio automatico del listener
+# Installazione: cp oracle-listener.service /etc/systemd/system/
+#                systemctl daemon-reload
+#                systemctl enable oracle-listener.service
+
+[Unit]
+Description=Oracle Listener
+After=network.target
+
+[Service]
+Type=forking
+User=oracle
+Group=oinstall
+Environment="ORACLE_HOME=/u01/app/oracle/product/26.0.0/dbhome_1"
+ExecStart=/u01/app/oracle/product/26.0.0/dbhome_1/bin/lsnrctl start
+ExecStop=/u01/app/oracle/product/26.0.0/dbhome_1/bin/lsnrctl stop
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
