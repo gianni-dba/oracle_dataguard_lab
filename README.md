@@ -66,4 +66,27 @@ Durante l'implementazione, sono state affrontate e risolte diverse criticità ti
 
 ---
 
-in progress...
+## Failover Test & Rebuild dello Standby
+
+È stato effettuato un test di **Failover** simulando il crash improvviso del nodo Primary (`oracle-node1`) tramite spegnimento forzato della VM su Proxmox, mentre erano in corso modifiche ai dati all'interno del `PDB1`.
+
+### 1. Promozione dello Standby a Primary (`oracle-node5`)
+* **Verifica pre-failover:** Prima di simulare il guasto, è stato verificato sullo Standby (`oracle-node5`) che il trasporto e l'applicazione dei log in tempo reale fossero allineati (`MRP0` in `APPLYING_LOG` e `RFS` attivo su `v$managed_standby`).
+* **Attivazione:** A seguito dello spegnimento del Primary, lo Standby è stato promosso manualmente arrestando il recovery gestito, completando l'applicazione dei redo residui (`FINISH`) e attivando il database come nuovo `PRIMARY` (`OPEN READ WRITE`).
+* **Aperture PDB e continuità applicativa:** I Pluggable Database sono stati aperti manualmente e ne è stato salvato lo stato (`SAVE STATE`) per i riavvii successivi. Grazie agli alias multi-host nel `tnsnames.ora`, i client sono stati reindirizzati automaticamente verso `oracle-node5` senza modifiche alle stringhe di connessione.
+* **Isolamento del nodo guasto:** Sul nuovo Primary è stato sospeso l'invio dei log verso il vecchio nodo (`LOG_ARCHIVE_DEST_STATE_2 = DEFER`) e svuotato `FAL_SERVER` per evitare errori di rete nell'alert log in attesa della ricostruzione di un nuovo nodo secondario.
+
+### 2. Lezione appresa: Configurazione preventiva di `listener.ora` e parametri
+Durante l'operazione sono emersi due aspetti fondamentali per evitare interventi urgenti in emergenza:
+* **Simmetria del `listener.ora` fin dal setup iniziale:** Il listener dell'ex-Standby (`oracle-node5`) conteneva inizialmente la sola registrazione statica del proprio `DB_UNIQUE_NAME` (`orcl_stby_node1`), utile esclusivamente per ricevere connessioni RMAN in `NOMOUNT`. Una volta diventato Primary, è stato necessario integrare il `listener.ora` con i servizi generici (`ORCL`) e per il Broker (`_DGMGRL`), assicurandosi che il `SID_NAME` rispettasse rigorosamente il *case-sensitive* dell'istanza Linux (`orcl` in minuscolo).
+* **Best practice:** configurare fin dal giorno zero un `listener.ora` completo e simmetrico su entrambi i nodi.
+* **Coerenza di `DB_UNIQUE_NAME`:** È stato verificato che dopo un failover il database mantenesse il proprio `DB_UNIQUE_NAME` originario (`orcl_stby_node1`) pur assumendo il ruolo di `PRIMARY`, rendendo necessario l'aggiornamento di `LOG_ARCHIVE_CONFIG` e delle destinazioni di archiviazione prima di agganciare un nuovo nodo secondario.
+
+### 3. Ricostruzione di un nuovo nodo Standby (`oracle-node6`)
+Per ripristinare l'alta affidabilità a seguito della dismissione del vecchio Primary (`oracle-node1`), è stato simulato l'inserimento di un server vergine (`oracle-node6`) clonando una VM esistente e rimuovendo completamente datafile, controlfile, redo log e `spfile` preesistenti (mantenendo solo i binari dell'Oracle Home).
+* **Preparazione:** Aggiornati `/etc/hosts`, `tnsnames.ora` e `listener.ora` (con registrazione statica per `orcl_stby_new` e `SID_NAME = orcl`), allineato il password file (`orapworcl`) e avviata l'istanza in `NOMOUNT` tramite un `init.ora` minimale.
+* **RMAN Active Duplicate:** Il nuovo Standby è stato ricostruito interamente via rete dal nuovo Primary (`oracle-node5`) tramite `DUPLICATE TARGET DATABASE FOR STANDBY FROM ACTIVE DATABASE`, sovrascrivendo dinamicamente nell'`SPFILE` i parametri di ruolo (`db_unique_name`, `log_archive_config`, `log_archive_dest_1/2`, `fal_server`).
+* **Riattivazione replica:** Al termine della duplicazione, riabilitando `log_archive_dest_state_2` sul Primary e avviando il processo `MRP0` sul nuovo Standby, il flusso `RFS -> MRP0` è ripartito regolarmente ristabilendo la protezione Data Guard.
+
+---
+
