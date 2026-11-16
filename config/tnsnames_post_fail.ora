@@ -1,0 +1,135 @@
+# tnsnames.ora per Data Guard
+# Definisce alias per CDB e PDB con supporto failover automatico
+# CDB
+# Connessione diretta al Primario (mantenuto per retrocompatibilità, abitudine dei client)
+ORCL_PRI =
+  (DESCRIPTION =
+    (ADDRESS_LIST =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = oracle-node5)(PORT = 1521))
+    )
+    (CONNECT_DATA =
+      (SERVICE_NAME = ORCL)
+    )
+  )
+
+# Connessione diretta al Primario
+ORCL_STBY_NODE1 =
+  (DESCRIPTION =
+    (ADDRESS_LIST =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = oracle-node5)(PORT = 1521))
+    )
+    (CONNECT_DATA =
+      (SERVICE_NAME = orcl_stby_node1)
+    )
+  )
+
+#connessione standby
+ORCL_STBY_NEW =
+  (DESCRIPTION =
+    (ADDRESS_LIST =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = oracle-node6)(PORT = 1521))
+    )
+    (CONNECT_DATA =
+      (SERVICE_NAME = orcl_stby_new)
+    )
+  )
+
+#connessione failover
+ORCL =
+  (DESCRIPTION =
+    (ADDRESS_LIST =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = oracle-node5)(PORT = 1521))
+      (ADDRESS = (PROTOCOL = TCP)(HOST = oracle-node6)(PORT = 1521))
+    )
+    (CONNECT_DATA =
+      (SERVICE_NAME = ORCL)
+    )
+  )
+
+
+PDB1_PRI =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = oracle-node5)(PORT = 1521))
+    (CONNECT_DATA =
+      (SERVICE_NAME = pdb1)
+    )
+  )
+
+PDB1_STBY =
+  (DESCRIPTION =
+    (ADDRESS_LIST =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = oracle-node6)(PORT = 1521))
+    )
+    (CONNECT_DATA =
+      (SERVICE_NAME = pdb1)
+    )
+  )
+
+PDB1 =
+  (DESCRIPTION =
+    (ADDRESS_LIST =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = oracle-node5)(PORT = 1521))
+      (ADDRESS = (PROTOCOL = TCP)(HOST = oracle-node6)(PORT = 1521))
+    )
+    (CONNECT_DATA =
+      (SERVICE_NAME = pdb1)
+    )
+  )
+
+PDB2_PRI =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = oracle-node5)(PORT = 1521))
+    (CONNECT_DATA =
+      (SERVICE_NAME = pdb2)
+    )
+  )
+
+PDB2_STBY =
+  (DESCRIPTION =
+    (ADDRESS_LIST =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = oracle-node6)(PORT = 1521))
+    )
+    (CONNECT_DATA =
+      (SERVICE_NAME = pdb2)
+    )
+  )
+
+PDB2 =
+  (DESCRIPTION =
+    (ADDRESS_LIST =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = oracle-node5)(PORT = 1521))
+      (ADDRESS = (PROTOCOL = TCP)(HOST = oracle-node6)(PORT = 1521))
+    )
+    (CONNECT_DATA =
+      (SERVICE_NAME = pdb2)
+    )
+  )
+  
+PDB3_PRI =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = oracle-node5)(PORT = 1521))
+    (CONNECT_DATA =
+      (SERVICE_NAME = pdb3)
+    )
+  )
+
+PDB3_STBY =
+  (DESCRIPTION =
+    (ADDRESS_LIST =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = oracle-node6)(PORT = 1521))
+    )
+    (CONNECT_DATA =
+      (SERVICE_NAME = pdb3)
+    )
+  )
+
+PDB3 =
+  (DESCRIPTION =
+    (ADDRESS_LIST =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = oracle-node5)(PORT = 1521))
+      (ADDRESS = (PROTOCOL = TCP)(HOST = oracle-node6)(PORT = 1521))
+    )
+    (CONNECT_DATA =
+      (SERVICE_NAME = pdb3)
+    )
+  )
