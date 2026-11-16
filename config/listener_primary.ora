@@ -1,0 +1,28 @@
+LISTENER =
+  (DESCRIPTION_LIST =
+    (DESCRIPTION =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = oracle-node5)(PORT = 1521))
+    )
+  )
+
+SID_LIST_LISTENER =
+  (SID_LIST =
+    # per connessioni amministrative locali con db_unique_name
+    (SID_DESC =
+      (GLOBAL_DBNAME = orcl_stby_node1)
+      (ORACLE_HOME = /u01/app/oracle/product/26.0.0/dbhome_1)
+      (SID_NAME = orcl)
+    )
+    # per il Broker
+    (SID_DESC =
+      (GLOBAL_DBNAME = orcl_stby_node1_DGMGRL)
+      (ORACLE_HOME = /u01/app/oracle/product/26.0.0/dbhome_1)
+      (SID_NAME = orcl)
+    )
+    # alias generico ORCL
+    (SID_DESC =
+      (GLOBAL_DBNAME = ORCL)
+      (ORACLE_HOME = /u01/app/oracle/product/26.0.0/dbhome_1)
+      (SID_NAME = orcl)
+    )
+  )
